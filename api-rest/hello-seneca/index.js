@@ -1,4 +1,4 @@
-const firebaseAdmin = require('firebase-admin')
+/*const firebaseAdmin = require('firebase-admin')
 
 const serviceAccount = require('./config/serviceAccountKey.json')
 
@@ -10,12 +10,12 @@ firebaseAdmin.initializeApp({
 const seneca = require("seneca")
 const config = require('./config/seneca.json')
 
-const moviesMic = require('./microservices/movies')
-const usersMIC = require('./microservices/users')
+const moviesMic = require('./microservices/movies/actions')
+const usersMIC = require('./microservices/users/actions')
 
 const server = seneca(config)
 server.use(moviesMic)
     .listen({type: 'http', port: 3000, pin: 'role:movies'})
 
 server.use(usersMIC)
-    .listen({type: 'http', port: 4000, pin: 'role:users'})
+    .listen({type: 'http', port: 4000, pin: 'role:users'})*/

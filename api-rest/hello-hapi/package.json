@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "hapi": "^18.1.0"
+    "hapi": "^18.1.0",
+    "hapi-jsonwebtoken": "^1.1.0",
+    "seneca": "^3.8.2"
   }
 }

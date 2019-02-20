@@ -1,75 +1,18 @@
-const firebaseAdmin = require('firebase-admin');
-const db = firebaseAdmin.firestore();
+const firebaseAdmin = require('firebase-admin')
 
-module.exports = function () {
-    const seneca = this 
+const serviceAccount = require('../../config/serviceAccountKey.json')
 
-    seneca.add('role:users, cmd:getAll', async (payload, reply) => {
-        try {
-            const usersRef = await db.collection('users').get();
-            const users = usersRef.docs.map(user => user.data());
-            reply(null, users);    
-        } catch (error) {
-            reply(error)
-        }  
-    });
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount),
+    databaseURL: "https://cursodevhack.firebaseio.com"
+});
 
-    seneca.add('role:users, cmd:getByName', async (payload, reply) => {
-        const { args } = payload;
-        const userDoc = await getUserByName(args.name);
-        reply(null, userDoc.data());
-    });
+const seneca = require("seneca")
+const usersMic = require('./actions')
+const config = require('../../config/seneca.json')
 
-    seneca.add('role:users, cmd:addUser', async (payload, reply) => {
-        const { args } = payload;
-        const userRef = await db.collection('users').add(args);
-        const userDoc = await db.collection('users').doc(userRef.id).get();
-        reply(null, {...userDoc.data(), ...{id: userRef.id}});
-    });
 
-    seneca.add('role:users, cmd:update', async (payload, reply) => {
-        const { filter, user } = payload
-        const userDoc = await getUserByName(filter.name);
-        if(userDoc) {
-            await userDoc.ref.set(user);
-            reply(null, userDoc.data());
-        } else {
-            //responde con un mensaje
-        }
-        //reply(null,userDoc.data());
-    });
+const usersServer = seneca(config)
+usersServer.use(usersMic)
+    .listen({type: 'http', port: 3001, pin: 'role:users'})
 
-    seneca.add('role:users, cmd:patch', async (payload, reply) => {
-        const { filter, user } = payload
-        const userDoc = await getUserByName(filter.name);
-        if(userDoc) {
-            //await userDoc.ref.set(req.body, {merge: true});
-            await userDoc.ref.update(user);
-            reply(null, userDoc.data());
-        } else {
-            //responde con un mensaje
-        }
-        //reply(null,userDoc.data());
-    });
-
-    seneca.add('role:users, cmd:delete', async (payload, reply) => {
-        const { args } = payload
-        const userDoc = await getUserByName(args.name);
-        if(userDoc) {
-            await userDoc.ref.delete();
-            reply(null, userDoc.data());
-        } else {
-            //responde con un mensaje
-        }
-    });
-}
-
-async function getUserByName(name) {
-    console.log('getUserByName', name);
-    const usersRef = await db.collection('users').where('name', '==', name).get();
-    let userDoc = null;
-    if(!usersRef.empty) {
-        userDoc = usersRef.docs[0];
-    }
-    return userDoc;
-}
