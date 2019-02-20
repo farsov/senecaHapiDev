@@ -1,0 +1,8 @@
+{
+    "strict": {
+        "result": false
+    },
+    "log": {
+        "level": "error+"
+    }
+}
